@@ -18,17 +18,20 @@ var getWeather = function(city) {
             return res.json();
         })
         .then(function (data) {
-            console.log(data);
+            // console.log(data);
             return fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${data.coord.lat}&lon=${data.coord.lon}&units=imperial&appid=8a42d43f7d7dc180da5b1e51890e67dc`)
         })
         .then(function (res) {
             return res.json();
         })
         .then(function (data) {
-            console.log(data);
+            // console.log(data);
             var currentWeather = data.current;
-            console.log(currentWeather);
+            var fiveDayForecast = data.daily;
+            console.log(fiveDayForecast)
+            // console.log(currentWeather);
             displayCurrentWeather(currentWeather);
+            getFiveDay(fiveDayForecast);
         })
         .catch(function(error) {
             notFound.show();
@@ -36,8 +39,10 @@ var getWeather = function(city) {
 };
 
 var displayCurrentWeather = function(data) {
+    $('#current-weather').empty();
+
     var currentWeatherCard = $('<div></div>');
-    currentWeatherCard.attr('class', 'card p-2');
+    currentWeatherCard.attr('class', 'card p-3 pb-4  m-3');
 
     var today = new Date().toLocaleDateString();
     var cityName = userCityInput.val();
@@ -46,7 +51,7 @@ var displayCurrentWeather = function(data) {
 
     var weatherIcon = $('<img>');
     var iconCode = data.weather[0].icon;
-    weatherIcon.attr('src', 'http://openweathermap.org/img/wn/' + iconCode + '.png');
+    weatherIcon.attr('src', 'http://openweathermap.org/img/wn/' + iconCode + '@2x.png');
     weatherIconSpan.append(weatherIcon);
 
     var city = $('<h2></h2>');
@@ -78,7 +83,6 @@ var displayCurrentWeather = function(data) {
     index.text(`${data.uvi}`);
     uvIndex.append(index);
     currentWeatherCard.append(uvIndex);
-    console.log(index.text);
 
     if (data.uvi >= 0 && data.uvi <= 2) {
         index.attr('class', 'btn btn-sm pe-none btn-success');
@@ -99,9 +103,61 @@ var displayCurrentWeather = function(data) {
 
     }
    
-    
-    // currentWeatherCard.text(weather.clouds);
     $('#current-weather').append(currentWeatherCard);
+};
+
+var getFiveDay = function(data) {
+    $('#five-day').empty();
+
+    for (let i = 0; i < 5; i++) {
+        var dailyWeather = data[i];
+        console.log(dailyWeather);
+
+        var day = new Date();
+        day.setDate((day.getDate() + 1) + i);
+        console.log(day.toLocaleDateString());
+
+        var fiveDayCard = $('<div></div>');
+        fiveDayCard.attr('class', 'col-2 card text-bg-primary p-2 m-3');
+    
+   
+        // var cityName = userCityInput.val();
+    
+        var weatherIconSpan = $('<span></span>');
+    
+        var weatherIcon = $('<img>');
+        var iconCode = dailyWeather.weather[0].icon;
+        weatherIcon.attr('src', 'http://openweathermap.org/img/wn/' + iconCode + '.png');
+        weatherIconSpan.append(weatherIcon);
+        fiveDayCard.append(weatherIconSpan);
+    
+        var date = $('<h2></h2>');
+        date.attr('class', 'card-title');
+        date.text(`${day.toLocaleDateString()}`);
+        date.append(weatherIconSpan);
+        fiveDayCard.append(date);
+        
+
+        // console.log(date);
+     
+        var temp = $('<p></p>');
+        temp.attr('class', 'card-text');
+        temp.text(`Temp: ${dailyWeather.temp.day}°F`);
+        fiveDayCard.append(temp);
+    
+        var wind = $('<p></p>');
+        wind.attr('class', 'card-text');
+        wind.text(`Wind: ${dailyWeather.wind_speed} MPH`);
+        fiveDayCard.append(wind);
+    
+        var humidity = $('<p></p>');
+        humidity.attr('class', 'card-text');
+        humidity.text(`Humidity: ${dailyWeather.humidity} %`);
+        fiveDayCard.append(humidity);
+
+        $('#five-day').append(fiveDayCard);
+    
+    }
 
 };
 
@@ -110,12 +166,9 @@ var closeError = function(event) {
     notFound.hide();
 };
 
-// var clearInput = function(event) {
-//     event.preventDefault();
-//     userCityInput.setAttribute('placeholder', userCityInput.value);
-//     userCityInput.value = '';
-// }
 
+
+// console.log(day.toLocaleDateString());
 
 searchButton.on('click', getUserCity);
 closeErrorButton.on('click', closeError);

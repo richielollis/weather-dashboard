@@ -14,26 +14,26 @@
 </head>
 
 <body>
-    <header class="text-center">
+    <header class="bg-primary bg-gradient text-white text-center">
         <h1>Weather Dashboard</h1>
     </header>
 
     <main class="row">
         <div class="col-3">
-            <div>
-                <h2>Search for a City:</h2>
+            <div class="border-bottom border-1 border-dark m-3">
+                <h2 class="p-2">Search for a City:</h2>
                 <form class="d-grid">
-                    <input id="user-city" type="text" placeholder="Charlotte">
+                    <input class="mb-3 p-2" id="user-city" type="text" placeholder="Charlotte">
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary" id="search-button">Search</button>
+                        <button type="submit" class="btn btn-primary mb-4 p-2" id="search-button">Search</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <div id="current-weather" class="col-9">
-            
-        </div>
+        <div id="current-weather" class="col-9"></div>
+
+        <div id="five-day" class="row"></div>
 
         <div id="city-not-found" class="modal" tabindex="-1">
             <div class="modal-dialog">
