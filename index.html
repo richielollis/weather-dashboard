@@ -14,12 +14,12 @@
 </head>
 
 <body>
-    <header class="bg-primary bg-gradient text-white text-center">
+    <header class="row bg-primary bg-gradient text-white text-center">
         <h1>Weather Dashboard</h1>
     </header>
 
     <main class="row">
-        <div class="col-3">
+        <div id="search" class="d-grid col-12 col-md-4">
             <div class="border-bottom border-1 border-dark m-3">
                 <h2 class="p-2">Search for a City:</h2>
                 <form class="d-grid">
@@ -31,7 +31,7 @@
             </div>
         </div>
 
-        <div id="current-weather" class="col-9"></div>
+        <div id="current-weather" class="col-sm-12 col-md-8"></div>
 
         <div id="five-day" class="row"></div>
 
