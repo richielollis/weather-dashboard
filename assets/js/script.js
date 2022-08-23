@@ -4,8 +4,8 @@ var notFound = $('#city-not-found');
 var closeErrorButton = $('#close-error');
 var searchHistory = $('<div></div>');
 searchHistory.attr('class', 'd-grid m-3').attr('id', 'search-history');
-var cityButton = $('<button></button>');
-cityButton.attr('class', 'btn btn-outline-secondary mb-4 p-2')
+var cityButtons = $('<div></div>');
+
 var searchHistoryArr = [];
 
 var getUserCity = function(event) {
@@ -17,10 +17,12 @@ var getUserCity = function(event) {
 var displaySearchHistory = function(city) {
     console.log(searchHistoryArr);
     for (let i = 0; i < searchHistoryArr.length; i++) {
+        var cityButton = $('<button></button>');
+        cityButton.attr('class', 'btn btn-outline-secondary mb-4 p-2');
         cityButton.text(searchHistoryArr[i]);
         $(searchHistory).append(cityButton);
-        $('#search').append(searchHistory);
     }
+    $('#search').append(searchHistory);
 };
 
 var searchHistoryHandler = function(event) {
@@ -61,7 +63,7 @@ var displayCurrentWeather = function(data) {
     $('#current-weather').empty();
 
     var currentWeatherCard = $('<div></div>');
-    currentWeatherCard.attr('class', 'card p-3 pb-4  m-3');
+    currentWeatherCard.attr('class', 'card p-3 pb-4 mt-3 mb-3 me-3 ms-1');
 
     var today = new Date().toLocaleDateString();
     var cityName = userCityInput.val();
@@ -127,6 +129,10 @@ var displayCurrentWeather = function(data) {
 
 var getFiveDay = function(data) {
     $('#five-day').empty();
+    var header = $('<h3></h3>');
+    header.attr('class', '')
+    header.text('5-Day Forecast:')
+    $('#five-day').append(header);
 
     for (let i = 0; i < 5; i++) {
         var dailyWeather = data[i];
@@ -137,22 +143,23 @@ var getFiveDay = function(data) {
         console.log(day.toLocaleDateString());
 
         var fiveDayCard = $('<div></div>');
-        fiveDayCard.attr('class', 'col-sm-12 col-md-2 card text-bg-primary p-2 m-3');
+        fiveDayCard.attr('class', 'col-sm-12 col-md-2 card text-bg-primary p-2 ms-2 me-3');
+        // fiveDayCard.attr('style', 'width: 20rem')
     
         var weatherIconSpan = $('<span></span>');
+
+        var date = $('<h5></h5>');
+        date.attr('class', 'card-title');
+        date.text(`${day.toLocaleDateString()}`);
+        // date.append(weatherIcon);
+        fiveDayCard.append(date);
     
         var weatherIcon = $('<img>');
         var iconCode = dailyWeather.weather[0].icon;
         weatherIcon.attr('src', 'http://openweathermap.org/img/wn/' + iconCode + '.png');
         weatherIconSpan.append(weatherIcon);
-        fiveDayCard.append(weatherIconSpan);
+        fiveDayCard.append(weatherIconSpan); 
     
-        var date = $('<h2></h2>');
-        date.attr('class', 'card-title');
-        date.text(`${day.toLocaleDateString()}`);
-        date.append(weatherIconSpan);
-        fiveDayCard.append(date);
-        
         var temp = $('<p></p>');
         temp.attr('class', 'card-text');
         temp.text(`Temp: ${dailyWeather.temp.day}°F`);
