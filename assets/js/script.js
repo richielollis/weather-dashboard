@@ -1,54 +1,46 @@
+// declaring different variables to be used throughout
 var userCityInput = $('#user-city');
 var searchButton = $('#search-button');
 var notFound = $('#city-not-found');
 var closeErrorButton = $('#close-error');
 var searchHistory = $('<div></div>');
-searchHistory.attr('class', 'd-grid m-3').attr('id', 'search-history');
-var cityButtons = $('<div></div>');
+searchHistory.attr('class', 'd-grid m-3 overflow-auto').attr('id', 'search-history');
+searchHistory.css('height', '100px');
+searchHistory.css('max-height', '300px');
 
+//setting empty array to house searched citiy names
 var searchHistoryArr = [];
 
+// grabs the city that the user is searching and passes it to getWeather function
 var getUserCity = function(event) {
     event.preventDefault();
     var userCity = userCityInput.val();
     getWeather(userCity);
 };
 
-var displaySearchHistory = function(city) {
-    console.log(searchHistoryArr);
-    for (let i = 0; i < searchHistoryArr.length; i++) {
-        var cityButton = $('<button></button>');
-        cityButton.attr('class', 'btn btn-outline-secondary mb-4 p-2');
-        cityButton.text(searchHistoryArr[i]);
-        $(searchHistory).append(cityButton);
-    }
-    $('#search').append(searchHistory);
-};
-
-var searchHistoryHandler = function(event) {
-    event.preventDefault();
-    var city = cityButton.text();
-    console.log(city);
-    getWeather(city);
-};
-
-
+// grabs all the info we need from the api's
+// we through the city to the first fetch in order to grab the lat and lon for the second fetch to return the weather
 var getWeather = function(city) {
     fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=8a42d43f7d7dc180da5b1e51890e67dc`)
         .then(function (res) {
             return res.json();
         })
         .then(function (data) {
-            searchHistoryArr.push(data.name);
+            // checks search history array to see if city is name is there, if not then we push it to the array
+            if(!searchHistoryArr.includes(data.name)) {
+                searchHistoryArr.push(data.name);
+
+            }
             return fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${data.coord.lat}&lon=${data.coord.lon}&units=imperial&appid=8a42d43f7d7dc180da5b1e51890e67dc`)
         })
         .then(function (res) {
             return res.json();
         })
         .then(function (data) {
+            // grabing current day weather and 5 day forecast 
             var currentWeather = data.current;
             var fiveDayForecast = data.daily;
-            console.log(fiveDayForecast)
+            // calling functions and passing the correct data along
             displaySearchHistory(userCityInput.val());
             displayCurrentWeather(currentWeather);
             getFiveDay(fiveDayForecast);
@@ -59,47 +51,58 @@ var getWeather = function(city) {
         });
 };
 
+// displays the surrent same day weather for the city that user searched 
 var displayCurrentWeather = function(data) {
     $('#current-weather').empty();
 
+    // creates a current weather card 
     var currentWeatherCard = $('<div></div>');
-    currentWeatherCard.attr('class', 'card p-3 pb-4 mt-3 mb-3 me-3 ms-1');
+    currentWeatherCard.attr('class', 'card p-3 pb-4 m-3');
 
+    // declaring the date the user searched
     var today = new Date().toLocaleDateString();
     var cityName = userCityInput.val();
 
+    // span for image of weather (clouds, sun, partial clouds, etc.)
     var weatherIconSpan = $('<span></span>');
 
+    // weather image
     var weatherIcon = $('<img>');
     var iconCode = data.weather[0].icon;
     weatherIcon.attr('src', 'http://openweathermap.org/img/wn/' + iconCode + '@2x.png');
     weatherIconSpan.append(weatherIcon);
 
+    // add city name to card
     var city = $('<h2></h2>');
     city.attr('class', 'card-title');
     city.text(`${cityName} (${today})`);
     city.append(weatherIconSpan);
     currentWeatherCard.append(city);
- 
+    
+    //add temp to card
     var temp = $('<p></p>');
     temp.attr('class', 'card-text');
     temp.text(`Temp: ${data.temp}°F`);
     currentWeatherCard.append(temp);
 
+    //add wind speed to card
     var wind = $('<p></p>');
     wind.attr('class', 'card-text');
     wind.text(`Wind: ${data.wind_speed} MPH`);
     currentWeatherCard.append(wind);
 
+    // add humidity to card
     var humidity = $('<p></p>');
     humidity.attr('class', 'card-text');
     humidity.text(`Humidity: ${data.humidity} %`);
     currentWeatherCard.append(humidity);
 
+    // add uv index to card
     var uvIndex = $('<p></p>');
     uvIndex.attr('class', 'card-text');
     uvIndex.text(`UV Index: `)
 
+    // make uv index responsive to show different uv levels
     var index = $('<button></button>');
     index.text(`${data.uvi}`);
     uvIndex.append(index);
@@ -124,34 +127,32 @@ var displayCurrentWeather = function(data) {
 
     }
    
+    // append weather card to the current weather div
     $('#current-weather').append(currentWeatherCard);
 };
 
+// this function does exactly what the displayCurrentWeather function does, except its for the 5 day forecast
 var getFiveDay = function(data) {
     $('#five-day').empty();
     var header = $('<h3></h3>');
-    header.attr('class', '')
+    header.attr('class', 'ms-3')
     header.text('5-Day Forecast:')
     $('#five-day').append(header);
 
     for (let i = 0; i < 5; i++) {
         var dailyWeather = data[i];
-        console.log(dailyWeather);
 
         var day = new Date();
         day.setDate((day.getDate() + 1) + i);
-        console.log(day.toLocaleDateString());
 
         var fiveDayCard = $('<div></div>');
-        fiveDayCard.attr('class', 'col-sm-12 col-md-2 card text-bg-primary p-2 ms-2 me-3');
-        // fiveDayCard.attr('style', 'width: 20rem')
+        fiveDayCard.attr('class', 'col-sm-12 col-md-2 m-1 card text-bg-primary p-2');
     
         var weatherIconSpan = $('<span></span>');
 
         var date = $('<h5></h5>');
         date.attr('class', 'card-title');
         date.text(`${day.toLocaleDateString()}`);
-        // date.append(weatherIcon);
         fiveDayCard.append(date);
     
         var weatherIcon = $('<img>');
@@ -179,12 +180,39 @@ var getFiveDay = function(data) {
     }
 };
 
+// displays the search history
+var displaySearchHistory = function(city) {
+    console.log(searchHistoryArr)
+    searchHistory.html('');
+    for (let i = 0; i < searchHistoryArr.length; i++) {
+        var cityButton = $('<button></button>');
+        cityButton.css('height', '50px');
+        cityButton.attr('class', 'btn btn-outline-secondary mb-4 p-2');
+        cityButton.text(searchHistoryArr[i]);
+        cityButton.on('click', searchHistoryHandler);
+        $(searchHistory).append(cityButton);
+        console.log(city);
+    }
+    console.log($('#city-button').text())
+    $('#search').append(searchHistory);
+    
+};
+
+// allows user to click a previously searched city and see the weather again
+var searchHistoryHandler = function(event) {
+    event.preventDefault();
+    var city = $(this).text();
+    userCityInput.val(city);
+    console.log(city);
+    getWeather(city);
+};
+
+// allows user to close error modal
 var closeError = function(event) {
     event.preventDefault();
     notFound.hide();
-    console.log(searchHistoryArr);
 };
 
+// event listeners 
 searchButton.on('click', getUserCity);
-cityButton.on('click', searchHistoryHandler);
 closeErrorButton.on('click', closeError);
