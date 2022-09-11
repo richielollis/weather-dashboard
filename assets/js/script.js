@@ -8,8 +8,11 @@ searchHistory.attr('class', 'd-grid m-3 overflow-auto').attr('id', 'search-histo
 searchHistory.css('height', '100px');
 searchHistory.css('max-height', '300px');
 
-//setting empty array to house searched citiy names
-var searchHistoryArr = [];
+//setting empty array to house searched city names
+var searchHistoryArr = JSON.parse(localStorage.getItem('cities'));
+if (!searchHistoryArr.length) {
+    searchHistoryArr = [];
+};
 
 // grabs the city that the user is searching and passes it to getWeather function
 var getUserCity = function(event) {
@@ -29,7 +32,6 @@ var getWeather = function(city) {
             // checks search history array to see if city is name is there, if not then we push it to the array
             if(!searchHistoryArr.includes(data.name)) {
                 searchHistoryArr.push(data.name);
-
             }
             return fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${data.coord.lat}&lon=${data.coord.lon}&units=imperial&appid=8a42d43f7d7dc180da5b1e51890e67dc`)
         })
@@ -53,6 +55,8 @@ var getWeather = function(city) {
 
 // displays the surrent same day weather for the city that user searched 
 var displayCurrentWeather = function(data) {
+    localStorage.setItem('cities', JSON.stringify(searchHistoryArr));
+
     $('#current-weather').empty();
 
     // creates a current weather card 
@@ -72,7 +76,7 @@ var displayCurrentWeather = function(data) {
     weatherIcon.attr('src', 'http://openweathermap.org/img/wn/' + iconCode + '@2x.png');
     weatherIconSpan.append(weatherIcon);
 
-    // add city name to card
+    // add city name to card and add to local storage
     var city = $('<h2></h2>');
     city.attr('class', 'card-title');
     city.text(`${cityName} (${today})`);
@@ -182,7 +186,6 @@ var getFiveDay = function(data) {
 
 // displays the search history
 var displaySearchHistory = function(city) {
-    console.log(searchHistoryArr)
     searchHistory.html('');
     for (let i = 0; i < searchHistoryArr.length; i++) {
         var cityButton = $('<button></button>');
@@ -191,11 +194,8 @@ var displaySearchHistory = function(city) {
         cityButton.text(searchHistoryArr[i]);
         cityButton.on('click', searchHistoryHandler);
         $(searchHistory).append(cityButton);
-        console.log(city);
     }
-    console.log($('#city-button').text())
     $('#search').append(searchHistory);
-    
 };
 
 // allows user to click a previously searched city and see the weather again
