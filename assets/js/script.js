@@ -9,7 +9,7 @@ searchHistory.css('height', '100px');
 searchHistory.css('max-height', '300px');
 
 //setting empty array to house searched city names
-var searchHistoryArr = JSON.parse(localStorage.getItem('cities'));
+var searchHistoryArr = JSON.parse(localStorage.getItem('cities')); 
 if (!searchHistoryArr.length) {
     searchHistoryArr = [];
 };
@@ -213,6 +213,16 @@ var closeError = function(event) {
     notFound.hide();
 };
 
+//clear history
+var clearSearchHistory = function(event) {
+    event.preventDefault();
+    searchHistory.html('');
+    localStorage.clear();
+
+};
+
 // event listeners 
 searchButton.on('click', getUserCity);
 closeErrorButton.on('click', closeError);
+$('#clear').on('click', clearSearchHistory);
+
